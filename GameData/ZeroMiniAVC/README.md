@@ -22,17 +22,21 @@ ZeroMiniAVC is a small plugin which disable and prune all MiniAVC add by others 
 
 #### How to install it?
 
-Unzip all files. Put the 0ZeroMiniAVC folder in your KSP/GameData folder.
+Unzip all files. Put the ZeroMiniAVC folder in your KSP/GameData folder.
 
 #### How to update it?
 
-Unzip all files. Merge the new 0ZeroMiniAVC folder with the old folder which is in your KSP/GameData folder.
+Unzip all files. Merge the new ZeroMiniAVC folder with the old folder which is in your KSP/GameData folder.
 
 #### How to uninstall it?
 
-Delete the 0ZeroMiniAVC folder in your KSP/GameData folder.
+Delete the ZeroMiniAVC folder in your KSP/GameData folder.
 
 #### Changelog
+
+
+v1.01 - 2016.07.21
+* Fix: Added a deletion of existing MiniAVC already pruned.
 
 v1.00 - 2016.07.11
 * First release.

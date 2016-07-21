@@ -56,6 +56,9 @@ namespace ZeroMiniAVC {
 			for (int _i = _assemblies.Count - 1; _i >= 0; --_i) {
 				AssemblyLoader.LoadedAssembly _assembly = _assemblies[_i];
 				if (_assembly.name == "MiniAVC") {
+					if (File.Exists (_assembly.path + ".pruned")) {
+						File.Delete (_assembly.path + ".pruned");
+					}
 					File.Move (_assembly.path, _assembly.path + ".pruned");
 					string[] _path = _assembly.path.Split (new char[2] { '/', '\\' });
 					string _mod = _path[_path.IndexOf ("GameData") + 1];
