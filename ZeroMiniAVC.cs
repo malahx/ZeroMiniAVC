@@ -20,9 +20,10 @@ using System.IO;
 using UnityEngine;
 
 namespace ZeroMiniAVC {
+	
 	[KSPAddon (KSPAddon.Startup.Instantly, true)]
 	public class ZeroMiniAVC : MonoBehaviour {
-
+		
 		static ZeroMiniAVC Instance;
 
 		void Awake() {
@@ -32,30 +33,18 @@ namespace ZeroMiniAVC {
 			}
 			Instance = this;
 			DontDestroyOnLoad (Instance);
+			Debug.Log ("ZeroMiniAVC: Awake");
+		}
+
+		void Start() {
 			Debug.LogWarning ("ZeroMiniAVC started ...");
 			ScreenMessages.PostScreenMessage ("ZeroMiniAVC started...", 10);
 			AssemblyLoader.LoadedAssembyList _assemblies = AssemblyLoader.loadedAssemblies;
 			for (int _i = _assemblies.Count - 1; _i >= 0; --_i) {
 				AssemblyLoader.LoadedAssembly _assembly = _assemblies[_i];
 				if (_assembly.name == "MiniAVC") {
-					// Remove/Unload MiniAVC here seems to bug mods which use assemblies.
-					Debug.LogWarning ("MiniAVC is disabled and will be pruned at the shutdown of KSP.");
-					ScreenMessages.PostScreenMessage ("MiniAVC will be pruned at the shutdown of KSP.", 10);
-					return;
-				}
-			}
-			Debug.LogWarning ("ZeroMiniAVC destroyed...");
-			ScreenMessages.PostScreenMessage ("ZeroMiniAVC destroyed...", 10);
-			Destroy (this);
-		}
-
-		void OnApplicationQuit() {
-			Debug.LogWarning ("ZeroMiniAVC prune all MiniAVC ...");
-			ScreenMessages.PostScreenMessage ("ZeroMiniAVC prune all MiniAVC ...", 10);
-			AssemblyLoader.LoadedAssembyList _assemblies = AssemblyLoader.loadedAssemblies;
-			for (int _i = _assemblies.Count - 1; _i >= 0; --_i) {
-				AssemblyLoader.LoadedAssembly _assembly = _assemblies[_i];
-				if (_assembly.name == "MiniAVC") {
+					_assembly.Unload ();
+					AssemblyLoader.loadedAssemblies.RemoveAt (_i);
 					if (File.Exists (_assembly.path + ".pruned")) {
 						File.Delete (_assembly.path + ".pruned");
 					}
@@ -66,8 +55,25 @@ namespace ZeroMiniAVC {
 					ScreenMessages.PostScreenMessage ("MiniAVC pruned for " + _mod, 10);
 				}
 			}
-			Debug.LogWarning ("ZeroMiniAVC ended.");
-			ScreenMessages.PostScreenMessage ("ZeroMiniAVC ended.", 10);
+			Debug.LogWarning ("ZeroMiniAVC destroyed...");
+			ScreenMessages.PostScreenMessage ("ZeroMiniAVC destroyed...", 10);
+			Destroy (this);
+		}
+	}
+}
+
+// From MiniAVC GPLv3 Copyright (C) 2014 CYBUTEK
+namespace MiniAVC {
+	public class Logger : MonoBehaviour {
+		void Awake() {
+			Debug.Log ("MiniAVC.Logger: Destroy");
+			Destroy (this);
+		}
+	}
+	public class Starter : MonoBehaviour {
+		void Awake() {
+			Debug.Log ("MiniAVC.Starter: Destroy");
+			Destroy (this);
 		}
 	}
 }

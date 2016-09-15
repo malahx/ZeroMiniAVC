@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #### What is it?
 
-ZeroMiniAVC is a small plugin which disable and prune all MiniAVC add by others mods.
+ZeroMiniAVC is a small plugin which disable and prune all MiniAVC added by others mods.
 
 #### How to install it?
 
@@ -34,6 +34,10 @@ Delete the ZeroMiniAVC folder in your KSP/GameData folder.
 
 #### Changelog
 
+v1.02 - 2016.09.15
+* Fix: MiniAVC is now pruned at the start of ZeroMiniAVC,
+* Fix: Rename the dll to ZeroMiniAVC.dll,
+* Fix: Added a better way to block the first start of MiniAVC (needs some test).
 
 v1.01 - 2016.07.21
 * Fix: Added a deletion of existing MiniAVC already pruned.
