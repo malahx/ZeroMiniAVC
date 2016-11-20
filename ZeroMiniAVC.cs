@@ -26,6 +26,43 @@ namespace ZeroMiniAVC {
 		
 		static ZeroMiniAVC Instance;
 
+		readonly string pruneExt = ".pruned";
+		readonly string cfgNode = "ZeroMiniAVC";
+		readonly string configPath = KSPUtil.ApplicationRootPath + "GameData/ZeroMiniAVC/Config.cfg";
+
+		ConfigNode config;
+		bool disabled = false;
+		bool prune = true;
+		bool delete = false;
+		bool noMessage = false;
+
+		ConfigNode loadConfig() {
+			ConfigNode[] _nodes = GameDatabase.Instance.GetConfigNodes (cfgNode);
+			if (_nodes.Length > 0) {
+				ConfigNode _node = _nodes[_nodes.Length - 1];
+				if (_node.HasValue ("disabled")) {
+					disabled = bool.Parse (_node.GetValue ("disabled"));
+				}
+				if (_node.HasValue ("prune")) {
+					prune = bool.Parse (_node.GetValue ("prune"));
+				}
+				if (_node.HasValue ("delete")) {
+					delete = bool.Parse (_node.GetValue ("delete"));
+				}
+				if (_node.HasValue ("noMessage")) {
+					noMessage = bool.Parse (_node.GetValue ("noMessage"));
+				}
+				return _node;
+			}
+			return new ConfigNode();
+		}
+
+		string mod(string path) {
+			string[] _splitedPath = path.Split (new char[2] { '/', '\\' });
+			string _mod = _splitedPath[_splitedPath.IndexOf ("GameData") + 1];
+			return _mod;
+		}
+
 		void Awake() {
 			if (Instance != null) {
 				Destroy (this);
@@ -33,31 +70,92 @@ namespace ZeroMiniAVC {
 			}
 			Instance = this;
 			DontDestroyOnLoad (Instance);
+			config = loadConfig ();
 			Debug.Log ("ZeroMiniAVC: Awake");
 		}
 
 		void Start() {
-			Debug.LogWarning ("ZeroMiniAVC started ...");
-			ScreenMessages.PostScreenMessage ("ZeroMiniAVC started...", 10);
+			if (disabled) {
+				Debug.LogWarning ("ZeroMiniAVC: Disabled ... destroy.");
+				Destroy (this);
+				return;
+			}
+			screenMsg ("ZeroMiniAVC started ...");
+
+			cleanMiniAVC ();
+
+			if (!prune && !delete) {
+				cleanData ();
+			}
+
+			ConfigNode _config = new ConfigNode ();
+			_config.AddNode (config);
+			_config.Save (configPath);
+
+			screenMsg ("ZeroMiniAVC destroyed...");
+			Destroy (this);
+		}
+
+		void cleanMiniAVC() {
 			AssemblyLoader.LoadedAssembyList _assemblies = AssemblyLoader.loadedAssemblies;
 			for (int _i = _assemblies.Count - 1; _i >= 0; --_i) {
 				AssemblyLoader.LoadedAssembly _assembly = _assemblies[_i];
 				if (_assembly.name == "MiniAVC") {
 					_assembly.Unload ();
 					AssemblyLoader.loadedAssemblies.RemoveAt (_i);
-					if (File.Exists (_assembly.path + ".pruned")) {
-						File.Delete (_assembly.path + ".pruned");
+					string _mod = mod (_assembly.path);
+					string _prunePath = _assembly.path + pruneExt;
+					if (File.Exists (_prunePath)) {
+						File.Delete (_prunePath);
 					}
-					File.Move (_assembly.path, _assembly.path + ".pruned");
-					string[] _path = _assembly.path.Split (new char[2] { '/', '\\' });
-					string _mod = _path[_path.IndexOf ("GameData") + 1];
-					Debug.LogWarning ("MiniAVC pruned for " + _mod);
-					ScreenMessages.PostScreenMessage ("MiniAVC pruned for " + _mod, 10);
+					if (prune) {
+						File.Move (_assembly.path, _prunePath);
+						ConfigNode _cfgMod = config.AddNode ("mod");
+						_cfgMod.AddValue ("name", _mod);
+						_cfgMod.AddValue ("pruned", _prunePath);
+						screenMsg ("MiniAVC pruned for " + _mod);
+					}
+					else if (delete) {
+						File.Delete (_assembly.path);
+						screenMsg ("MiniAVC deleted for " + _mod);
+					}
+					else {
+						screenMsg ("MiniAVC disabled for " + _mod);
+					}
 				}
 			}
-			Debug.LogWarning ("ZeroMiniAVC destroyed...");
-			ScreenMessages.PostScreenMessage ("ZeroMiniAVC destroyed...", 10);
-			Destroy (this);
+		}
+
+		void cleanData() {
+			ConfigNode[] _cfgMods = config.GetNodes ("mod");
+			for (int _i = _cfgMods.Length - 1; _i >= 0; --_i) {
+				ConfigNode _cfgMod = _cfgMods[_i];
+				string _prunedPath = _cfgMod.GetValue ("pruned");
+				string _mod = _cfgMod.GetValue ("name");
+				if (File.Exists (_prunedPath)) {
+					string _unprunedPath = _prunedPath.Substring (0, _prunedPath.Length - pruneExt.Length);
+					if (File.Exists (_unprunedPath)) {
+						File.Delete (_prunedPath);
+						screenMsg ("MiniAVC deleted prune duplication for " + _mod);
+					}
+					else {
+						File.Move (_prunedPath, _unprunedPath);
+						screenMsg ("MiniAVC unpruned for " + _mod);
+					}
+				}
+				else {
+					screenMsg ("MiniAVC data removed for " + _mod);
+				}
+				config.RemoveNode (_cfgMod);
+			}
+		}
+
+		void screenMsg(string msg) {
+			Debug.LogWarning (msg);
+			if (noMessage) {
+				return;
+			}
+			ScreenMessages.PostScreenMessage (msg, 10);
 		}
 	}
 }
