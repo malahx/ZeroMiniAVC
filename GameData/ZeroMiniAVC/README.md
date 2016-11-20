@@ -37,6 +37,8 @@ Delete the ZeroMiniAVC folder in your KSP/GameData folder.
 v1.03 - 2016.11.20
 * New: Added a config file,
 * New: Added an unpruned function,
+* New: Added a delete function,
+* New: Added a disable function,
 * Compiled against KSP 1.2.1.1604
 
 v1.02 - 2016.09.15
