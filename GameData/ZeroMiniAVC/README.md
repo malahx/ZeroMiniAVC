@@ -1,6 +1,6 @@
 ﻿#### ZeroMiniAVC
 #### A plugin for Kerbal Space Program
-#### Copyright 2016 Malah
+#### Copyright 2017 Malah
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,7 +34,10 @@ Delete the ZeroMiniAVC folder in your KSP/GameData folder.
 
 #### Changelog
 
-v1.04.9-pre 2017.04.08
+v1.05 - 2017.05.26
+* Compiled against KSP 1.3.0.1804
+
+v1.04.9-pre - 2017.04.08
 * Compiled against KSP 1.2.9.1743
 
 v1.04 - 2016.12.07
